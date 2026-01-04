@@ -1,0 +1,2346 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EduMaster Kids - Sistem Manajemen Les Lengkap</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- html2canvas -->
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        kidBlue: '#38BDF8', kidYellow: '#FBBF24', kidGreen: '#34D399',
+                        kidPurple: '#A78BFA', kidPink: '#F472B6', kidOrange: '#FB923C',
+                        kidRed: '#F87171', kidIndigo: '#818CF8',
+                        primary: {
+                            50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8'
+                        },
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444'
+                    },
+                    fontFamily: { 
+                        nunito: ['Nunito', 'sans-serif'],
+                        poppins: ['Poppins', 'sans-serif']
+                    },
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'slide-in': 'slideIn 0.5s ease-out'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateX(-20px)', opacity: 0 },
+                            '100%': { transform: 'translateX(0)', opacity: 1 }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        * {
+            font-family: 'Nunito', sans-serif;
+        }
+        body { background-color: #F8FAFC; }
+        .fade-in { animation: fadeIn 0.4s ease-out; }
+        @keyframes fadeIn { 
+            from { opacity: 0; transform: translateY(10px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .kids-gradient {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .professional-gradient {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #E0F2FE; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #7DD3FC; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #38BDF8; }
+        
+        .theme-kids {
+            --primary: #38BDF8;
+            --secondary: #F472B6;
+            --accent: #FBBF24;
+            --bg-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .theme-professional {
+            --primary: #3B82F6;
+            --secondary: #10B981;
+            --accent: #8B5CF6;
+            --bg-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        
+        .input-field {
+            @apply w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-kidBlue focus:ring-2 focus:ring-blue-200 outline-none transition;
+        }
+        
+        .btn-primary {
+            @apply px-6 py-3 bg-kidBlue hover:bg-blue-500 text-white font-bold rounded-xl transition-all duration-300 hover:shadow-lg active:scale-95;
+        }
+        
+        .btn-success {
+            @apply px-6 py-3 bg-kidGreen hover:bg-emerald-500 text-white font-bold rounded-xl transition-all duration-300 hover:shadow-lg active:scale-95;
+        }
+        
+        .btn-warning {
+            @apply px-6 py-3 bg-kidYellow hover:bg-amber-500 text-white font-bold rounded-xl transition-all duration-300 hover:shadow-lg active:scale-95;
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #38BDF8;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .exam-option {
+            transition: all 0.2s ease;
+        }
+        
+        .exam-option:hover {
+            transform: translateX(5px);
+        }
+        
+        .exam-option.selected {
+            background-color: #dbeafe;
+            border-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="theme-kids text-slate-700">
+
+    <div id="app"></div>
+
+    <!-- NOTIFIKASI TOAST -->
+    <div id="toast" class="fixed bottom-4 right-4 bg-slate-800 text-white px-6 py-3 rounded-xl shadow-2xl transform translate-y-20 transition-transform duration-300 z-[1000] flex items-center gap-3 glass-effect">
+        <i id="toastIcon" class="fas fa-info-circle text-kidYellow"></i>
+        <span id="toastMsg" class="font-bold text-sm">Pesan Notifikasi</span>
+    </div>
+
+    <!-- LOADING OVERLAY -->
+    <div id="loading" class="fixed inset-0 bg-white/80 flex items-center justify-center z-[2000] hidden">
+        <div class="text-center">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="font-bold text-slate-600">Memuat...</p>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // KONFIGURASI APLIKASI
+        // =============================================
+        const APP_CONFIG = {
+            appName: 'EduMaster Kids',
+            version: '2.0',
+            backendUrl: 'https://script.google.com/macros/s/AKfycbx8wo9iPEXUpyqUAyjtYzMohqGCThHAdVYbCT_uKIAeOhvhSC7jJLISARN96KELxFXzOg/exec', // Ganti dengan URL Google Apps Script
+            defaultTheme: 'kids',
+            currency: 'IDR',
+            pointPerMaterial: 10,
+            pointPerExam: 50,
+            pointPerAttendance: 5
+        };
+
+        // =============================================
+        // DATA AWAL & DATABASE LOKAL
+        // =============================================
+        const DEFAULT_DATA = {
+            students: [
+                { 
+                    id: 'admin', 
+                    name: 'Administrator', 
+                    email: 'admin@edumaster.id', 
+                    password: 'admin123', 
+                    role: 'admin', 
+                    phone: '081234567890',
+                    status: 'active',
+                    created_at: '2024-01-01',
+                    avatar: 'A'
+                },
+                { 
+                    id: 'S001', 
+                    name: 'Budi Santoso', 
+                    email: 'budi@email.com', 
+                    password: '123456', 
+                    role: 'student', 
+                    phone: '081234567891',
+                    status: 'active',
+                    parent_id: 'P001',
+                    grade: 'SD Kelas 5',
+                    programs: ['COD1', 'MNG1'],
+                    points: 1250,
+                    attendance_count: 12,
+                    total_meeting: 14,
+                    created_at: '2024-01-15',
+                    avatar: 'B'
+                },
+                { 
+                    id: 'P001', 
+                    name: 'Orang Tua Budi', 
+                    email: 'ortubudi@email.com', 
+                    password: 'parent123', 
+                    role: 'parent', 
+                    phone: '081234567892',
+                    status: 'active',
+                    child_id: 'S001',
+                    created_at: '2024-01-15',
+                    avatar: 'O'
+                }
+            ],
+            
+            programs: [
+                { 
+                    id: 'CAL1', 
+                    name: 'Calistung Dasar', 
+                    category: 'Calistung', 
+                    age_group: 'PAUD/TK', 
+                    packages: [
+                        { id: 'CAL1-BASIC', name: 'Paket Basic', duration: '3 bulan', price: 500000, features: ['Baca', 'Tulis', 'Hitung Dasar'] },
+                        { id: 'CAL1-PREMIUM', name: 'Paket Premium', duration: '6 bulan', price: 900000, features: ['Baca Lancar', 'Tulis Rapi', 'Hitung 1-100', 'Bonus Modul'] }
+                    ]
+                },
+                { 
+                    id: 'MNG1', 
+                    name: 'Mengaji & Tahfidz', 
+                    category: 'Mengaji', 
+                    age_group: 'Semua Umur', 
+                    packages: [
+                        { id: 'MNG1-BASIC', name: 'Paket Iqro', duration: '4 bulan', price: 400000 },
+                        { id: 'MNG1-PREMIUM', name: 'Paket Tahfidz Juz 30', duration: '8 bulan', price: 800000 }
+                    ]
+                },
+                { 
+                    id: 'COD1', 
+                    name: 'Coding untuk Pemula', 
+                    category: 'Coding', 
+                    age_group: 'SD/SMP/SMA', 
+                    packages: [
+                        { id: 'COD1-BASIC', name: 'Web Dasar', duration: '3 bulan', price: 1500000 },
+                        { id: 'COD1-PREMIUM', name: 'Full Stack Web', duration: '6 bulan', price: 2500000 }
+                    ]
+                },
+                { 
+                    id: 'DSG1', 
+                    name: 'Desain Grafis', 
+                    category: 'Desain', 
+                    age_group: 'SMP/SMA/Dewasa', 
+                    packages: [
+                        { id: 'DSG1-BASIC', name: 'Canva Master', duration: '2 bulan', price: 700000 },
+                        { id: 'DSG1-PREMIUM', name: 'Adobe Professional', duration: '4 bulan', price: 1200000 }
+                    ]
+                },
+                { 
+                    id: 'JOB1', 
+                    name: 'Persiapan Kerja', 
+                    category: 'Karir', 
+                    age_group: 'SMA/Dewasa', 
+                    packages: [
+                        { id: 'JOB1-BASIC', name: 'CV & Interview', duration: '1 bulan', price: 300000 },
+                        { id: 'JOB1-PREMIUM', name: 'Skill Lengkap', duration: '3 bulan', price: 800000 }
+                    ]
+                }
+            ],
+            
+            materials: [
+                { 
+                    id: 'MAT001', 
+                    title: 'Belajar HTML Dasar', 
+                    description: 'Panduan lengkap HTML untuk pemula', 
+                    category: 'Coding', 
+                    type: 'video', 
+                    icon: 'fa-code', 
+                    color: 'bg-kidBlue', 
+                    program_id: 'COD1',
+                    file_url: '#',
+                    thumbnail: 'https://picsum.photos/400/300?random=1',
+                    author: 'Guru Coding',
+                    points: 10,
+                    duration: '45 menit',
+                    created_at: '2024-01-10'
+                },
+                { 
+                    id: 'MAT002', 
+                    title: 'Matematika: Perkalian', 
+                    description: 'Game edukasi perkalian 1-10', 
+                    category: 'Calistung', 
+                    type: 'game', 
+                    icon: 'fa-calculator', 
+                    color: 'bg-kidGreen', 
+                    program_id: 'CAL1',
+                    file_url: '#',
+                    thumbnail: 'https://picsum.photos/400/300?random=2',
+                    author: 'Guru Matematika',
+                    points: 15,
+                    duration: '30 menit',
+                    created_at: '2024-01-12'
+                },
+                { 
+                    id: 'MAT003', 
+                    title: 'Tahsin & Tajwid Dasar', 
+                    description: 'Belajar membaca Al-Quran dengan benar', 
+                    category: 'Mengaji', 
+                    type: 'pdf', 
+                    icon: 'fa-book-quran', 
+                    color: 'bg-kidPurple', 
+                    program_id: 'MNG1',
+                    file_url: '#',
+                    thumbnail: 'https://picsum.photos/400/300?random=3',
+                    author: 'Ustadz Ahmad',
+                    points: 20,
+                    duration: '60 menit',
+                    created_at: '2024-01-15'
+                }
+            ],
+            
+            exams: [
+                { 
+                    id: 'EX1', 
+                    title: 'Kuis Logika Dasar', 
+                    description: 'Tes kemampuan logika dasar', 
+                    type: 'quiz', 
+                    duration: 60, 
+                    program_id: 'COD1',
+                    questions: [
+                        { 
+                            id: 1, 
+                            question: 'Jika 2 + 2 = 4, maka 4 + 4 = ?', 
+                            options: ['6', '8', '10', '12'], 
+                            answer: 1, 
+                            explanation: '4 + 4 = 8',
+                            points: 10
+                        },
+                        { 
+                            id: 2, 
+                            question: 'Warna bendera Indonesia adalah?', 
+                            options: ['Merah Biru', 'Merah Putih', 'Putih Merah', 'Hijau Kuning'], 
+                            answer: 1, 
+                            explanation: 'Merah di atas, putih di bawah',
+                            points: 10
+                        }
+                    ],
+                    passing_score: 70,
+                    status: 'active'
+                },
+                { 
+                    id: 'EX2', 
+                    title: 'Simulasi CAT CPNS', 
+                    description: 'Tes simulasi computer assisted test', 
+                    type: 'simulation', 
+                    duration: 120, 
+                    program_id: 'JOB1',
+                    questions: [
+                        { 
+                            id: 1, 
+                            question: 'Negara Indonesia menganut sistem pemerintahan?', 
+                            options: ['Presidensial', 'Parlamenter', 'Monarki', 'Komunis'], 
+                            answer: 0, 
+                            explanation: 'Sistem pemerintahan Indonesia adalah Presidensial',
+                            points: 20
+                        }
+                    ],
+                    passing_score: 65,
+                    status: 'active'
+                }
+            ],
+            
+            events: [
+                {
+                    id: 'EV1',
+                    title: 'Try Out UNBK Matematika',
+                    description: 'Try out persiapan UNBK Matematika SMP',
+                    type: 'tryout',
+                    date: '2024-03-15',
+                    time: '09:00',
+                    duration: 120,
+                    max_participants: 50,
+                    registered: 35,
+                    status: 'upcoming'
+                },
+                {
+                    id: 'EV2',
+                    title: 'Workshop Coding Dasar',
+                    description: 'Workshop pengenalan pemrograman untuk anak',
+                    type: 'workshop',
+                    date: '2024-03-20',
+                    time: '13:00',
+                    duration: 180,
+                    max_participants: 30,
+                    registered: 28,
+                    status: 'upcoming'
+                }
+            ],
+            
+            finance: {
+                transactions: [
+                    { id: 1717200000000, date: '2024-01-01', description: 'Modal Awal Usaha', type: 'in', amount: 10000000, method: 'transfer' },
+                    { id: 1717300000000, date: '2024-01-05', description: 'Beli Meja Belajar (5 Unit)', type: 'out', amount: 2500000, method: 'cash' },
+                    { id: 1717400000000, date: '2024-01-10', description: 'Pendaftaran Budi Santoso', type: 'in', amount: 1500000, method: 'transfer' }
+                ]
+            },
+            
+            messages: [
+                {
+                    id: 'MSG001',
+                    sender_id: 'S001',
+                    receiver_id: 'admin',
+                    message: 'Selamat pagi Pak Guru, saya ingin bertanya tentang materi coding',
+                    type: 'text',
+                    read: true,
+                    timestamp: '2024-01-20 08:30:00'
+                },
+                {
+                    id: 'MSG002',
+                    sender_id: 'admin',
+                    receiver_id: 'S001',
+                    message: 'Selamat pagi Budi, ada yang bisa saya bantu?',
+                    type: 'text',
+                    read: true,
+                    timestamp: '2024-01-20 08:35:00'
+                }
+            ],
+            
+            rewards: [
+                {
+                    student_id: 'S001',
+                    points: 1250,
+                    level: 3,
+                    badges: ['fast-learner', 'perfect-attendance', 'quiz-master'],
+                    achievements: [
+                        { id: 'ACH1', name: 'Menyelesaikan 10 Materi', date: '2024-01-18', points: 100 },
+                        { id: 'ACH2', name: 'Nilai Ujian Sempurna', date: '2024-01-19', points: 150 }
+                    ]
+                }
+            ],
+            
+            settings: {
+                theme: 'kids',
+                currency: 'IDR',
+                point_rate: 10
+            }
+        };
+
+        // =============================================
+        // VARIABEL GLOBAL
+        // =============================================
+        let DB = JSON.parse(localStorage.getItem('eduMasterDB')) || DEFAULT_DATA;
+        let currentUser = null;
+        let currentView = 'landing';
+        let currentTheme = localStorage.getItem('eduMasterTheme') || APP_CONFIG.defaultTheme;
+        let selectedPrograms = [];
+        let examSession = null;
+        let chatContacts = [];
+
+        // =============================================
+        // UTILITY FUNCTIONS
+        // =============================================
+        function saveData() {
+            localStorage.setItem('eduMasterDB', JSON.stringify(DB));
+        }
+
+        function showLoading(show = true) {
+            document.getElementById('loading').style.display = show ? 'flex' : 'none';
+        }
+
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toastIcon');
+            const msg = document.getElementById('toastMsg');
+            
+            // Set icon berdasarkan tipe
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            icon.className = `fas ${icons[type] || icons.info} ${type === 'success' ? 'text-green-400' : type === 'error' ? 'text-red-400' : type === 'warning' ? 'text-yellow-400' : 'text-kidYellow'}`;
+            msg.textContent = message;
+            
+            toast.classList.remove('translate-y-20');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20');
+            }, 3000);
+        }
+
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0
+            }).format(number);
+        }
+
+        function formatDate(dateString) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('id-ID', options);
+        }
+
+        function generateStudentId() {
+            return 'STU-' + Date.now().toString().slice(-6) + Math.floor(Math.random() * 100).toString().padStart(2, '0');
+        }
+
+        function switchTheme(theme) {
+            currentTheme = theme;
+            localStorage.setItem('eduMasterTheme', theme);
+            document.body.className = `theme-${theme} text-slate-700`;
+            renderCurrentView();
+        }
+
+        // =============================================
+        // API FUNCTIONS (Simulasi Backend)
+        // =============================================
+        async function callAPI(endpoint, data = {}) {
+            showLoading(true);
+            try {
+                // Simulasi API call delay
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Dalam implementasi nyata, ini akan memanggil Google Apps Script
+                // const response = await fetch(`${APP_CONFIG.backendUrl}`, {
+                //     method: 'POST',
+                //     body: JSON.stringify({ endpoint, data })
+                // });
+                // return await response.json();
+                
+                // Untuk sekarang, kita gunakan data lokal
+                showLoading(false);
+                return { success: true, data: DB };
+            } catch (error) {
+                showLoading(false);
+                showToast('Gagal terhubung ke server', 'error');
+                return { success: false, error: error.message };
+            }
+        }
+
+        // =============================================
+        // VIEW RENDER FUNCTIONS
+        // =============================================
+        function renderCurrentView() {
+            switch(currentView) {
+                case 'landing':
+                    renderLanding();
+                    break;
+                case 'login':
+                    renderLogin();
+                    break;
+                case 'register':
+                    renderRegistration();
+                    break;
+                case 'admin_dashboard':
+                    renderAdminDashboard();
+                    break;
+                case 'admin_students':
+                    renderAdminStudents();
+                    break;
+                case 'admin_materials':
+                    renderMaterialLibrary();
+                    break;
+                case 'admin_exams':
+                    renderAdminExams();
+                    break;
+                case 'admin_finance':
+                    renderAdminFinance();
+                    break;
+                case 'student_dashboard':
+                    renderStudentDashboard();
+                    break;
+                case 'student_materials':
+                    renderStudentMaterials();
+                    break;
+                case 'student_exams':
+                    renderStudentExams();
+                    break;
+                case 'student_schedule':
+                    renderStudentSchedule();
+                    break;
+                case 'student_chat':
+                    renderStudentChat();
+                    break;
+                case 'student_profile':
+                    renderStudentProfile();
+                    break;
+                case 'parent_dashboard':
+                    renderParentDashboard();
+                    break;
+                case 'exam_session':
+                    renderExamSession();
+                    break;
+                case 'material_detail':
+                    renderMaterialDetail();
+                    break;
+                case 'event_detail':
+                    renderEventDetail();
+                    break;
+                default:
+                    renderLanding();
+            }
+        }
+
+        function init() {
+            // Cek apakah ada user yang sudah login
+            const savedUser = localStorage.getItem('eduMasterCurrentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                if (currentUser.role === 'admin') {
+                    currentView = 'admin_dashboard';
+                } else if (currentUser.role === 'parent') {
+                    currentView = 'parent_dashboard';
+                } else {
+                    currentView = 'student_dashboard';
+                }
+            }
+            renderCurrentView();
+        }
+
+        // =============================================
+        // LANDING PAGE
+        // =============================================
+        function renderLanding() {
+            document.getElementById('app').innerHTML = `
+                <div class="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 overflow-hidden">
+                    <!-- Header -->
+                    <nav class="p-6 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl kids-gradient flex items-center justify-center">
+                                <i class="fas fa-graduation-cap text-white text-2xl"></i>
+                            </div>
+                            <h1 class="text-2xl font-black text-slate-800">Edu<span class="text-kidBlue">Master</span></h1>
+                        </div>
+                        <div class="flex gap-4">
+                            <button onclick="currentView='login'; renderCurrentView()" 
+                                class="px-6 py-2 rounded-full border-2 border-kidBlue text-kidBlue font-bold hover:bg-kidBlue hover:text-white transition">
+                                Masuk
+                            </button>
+                            <button onclick="currentView='register'; renderCurrentView()" 
+                                class="px-6 py-2 rounded-full bg-kidBlue text-white font-bold hover:bg-blue-500 transition shadow-lg">
+                                Daftar
+                            </button>
+                        </div>
+                    </nav>
+                    
+                    <!-- Hero Section -->
+                    <div class="container mx-auto px-6 py-12 text-center fade-in">
+                        <div class="max-w-4xl mx-auto">
+                            <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
+                                <span class="bg-clip-text text-transparent kids-gradient">Belajar Tanpa Batas</span><br>
+                                <span class="text-slate-700">dengan Sistem Lengkap</span>
+                            </h1>
+                            <p class="text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
+                                Platform les terlengkap untuk semua jenjang usia. Dari PAUD hingga persiapan karir, semua dalam satu aplikasi.
+                            </p>
+                            
+                            <div class="flex flex-col md:flex-row gap-6 justify-center mb-16">
+                                <button onclick="currentView='register'; renderCurrentView()" 
+                                    class="px-10 py-4 bg-gradient-to-r from-kidBlue to-blue-500 text-white rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl transition-all hover:scale-105">
+                                    <i class="fas fa-rocket mr-2"></i> Mulai Sekarang
+                                </button>
+                                <button onclick="scrollToFeatures()" 
+                                    class="px-10 py-4 bg-white text-slate-700 rounded-2xl font-bold border-2 border-slate-200 hover:border-kidBlue transition">
+                                    <i class="fas fa-play-circle mr-2"></i> Lihat Fitur
+                                </button>
+                            </div>
+                            
+                            <!-- Stats -->
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto mb-20">
+                                ${[
+                                    { icon: 'fa-users', value: '500+', label: 'Siswa Aktif' },
+                                    { icon: 'fa-book', value: '100+', label: 'Materi' },
+                                    { icon: 'fa-chalkboard-teacher', value: '50+', label: 'Pengajar' },
+                                    { icon: 'fa-award', value: '98%', label: 'Kepuasan' }
+                                ].map(stat => `
+                                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
+                                        <i class="fas ${stat.icon} text-3xl text-kidBlue mb-3"></i>
+                                        <h3 class="text-3xl font-black text-slate-800">${stat.value}</h3>
+                                        <p class="text-slate-500 font-bold">${stat.label}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Features -->
+                    <div class="bg-white py-20" id="features">
+                        <div class="container mx-auto px-6">
+                            <h2 class="text-4xl font-black text-center text-slate-800 mb-4">Fitur Lengkap</h2>
+                            <p class="text-slate-600 text-center mb-12 max-w-2xl mx-auto">
+                                Semua yang Anda butuhkan untuk belajar dan mengajar dalam satu platform
+                            </p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                                ${[
+                                    { icon: 'fa-user-graduate', title: 'Portal Siswa', desc: 'Dashboard lengkap dengan materi, ujian, dan progress belajar' },
+                                    { icon: 'fa-chart-line', title: 'Analytics', desc: 'Laporan statistik lengkap untuk pengambilan keputusan' },
+                                    { icon: 'fa-graduation-cap', title: 'Materi Interaktif', desc: 'Video, game, dan modul pembelajaran menarik' },
+                                    { icon: 'fa-file-alt', title: 'Ujian CBT', desc: 'Sistem ujian komputer lengkap dengan timer dan penilaian otomatis' },
+                                    { icon: 'fa-calendar-alt', title: 'Jadwal Pintar', desc: 'Manajemen jadwal dan absensi otomatis' },
+                                    { icon: 'fa-comments', title: 'Chat dengan Mentor', desc: 'Konsultasi langsung dengan pengajar' }
+                                ].map((feature, idx) => `
+                                    <div class="bg-gradient-to-br from-white to-slate-50 p-8 rounded-3xl shadow-lg border border-slate-100 card-hover">
+                                        <div class="w-16 h-16 rounded-2xl ${['bg-kidBlue', 'bg-kidGreen', 'bg-kidPurple', 'bg-kidPink', 'bg-kidYellow', 'bg-kidOrange'][idx]} flex items-center justify-center mb-6">
+                                            <i class="fas ${feature.icon} text-white text-2xl"></i>
+                                        </div>
+                                        <h3 class="text-xl font-black text-slate-800 mb-3">${feature.title}</h3>
+                                        <p class="text-slate-600">${feature.desc}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Programs -->
+                    <div class="bg-gradient-to-r from-blue-50 to-purple-50 py-20">
+                        <div class="container mx-auto px-6">
+                            <h2 class="text-4xl font-black text-center text-slate-800 mb-4">Program Unggulan</h2>
+                            <p class="text-slate-600 text-center mb-12 max-w-2xl mx-auto">
+                                Pilih program yang sesuai dengan kebutuhan belajar Anda
+                            </p>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                                ${[
+                                    { icon: 'fa-calculator', title: 'Calistung', desc: 'Baca, tulis, hitung untuk PAUD/TK', color: 'bg-kidBlue' },
+                                    { icon: 'fa-book-quran', title: 'Mengaji', desc: 'Tahsin, tahfidz, dan ilmu tajwid', color: 'bg-kidGreen' },
+                                    { icon: 'fa-code', title: 'Coding', desc: 'Pemrograman dari dasar hingga mahir', color: 'bg-kidPurple' },
+                                    { icon: 'fa-paint-brush', title: 'Desain', desc: 'Desain grafis dan multimedia', color: 'bg-kidPink' },
+                                    { icon: 'fa-language', title: 'Bahasa Asing', desc: 'Inggris, Mandarin, Arab, dll', color: 'bg-kidYellow' },
+                                    { icon: 'fa-bolt', title: 'Listrik & CCTV', desc: 'Instalasi dan perbaikan', color: 'bg-kidOrange' },
+                                    { icon: 'fa-chart-bar', title: 'Marketing', desc: 'Digital marketing & bisnis', color: 'bg-kidRed' },
+                                    { icon: 'fa-briefcase', title: 'Persiapan Kerja', desc: 'CV, interview, skill teknis', color: 'bg-kidIndigo' }
+                                ].map(program => `
+                                    <div class="bg-white p-6 rounded-2xl shadow-lg border border-slate-100 card-hover">
+                                        <div class="w-14 h-14 rounded-xl ${program.color} flex items-center justify-center mb-4">
+                                            <i class="fas ${program.icon} text-white text-xl"></i>
+                                        </div>
+                                        <h3 class="text-lg font-black text-slate-800 mb-2">${program.title}</h3>
+                                        <p class="text-sm text-slate-600">${program.desc}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Footer -->
+                    <footer class="bg-slate-800 text-white py-12">
+                        <div class="container mx-auto px-6 text-center">
+                            <p class="text-xl font-black mb-2">EduMaster Kids</p>
+                            <p class="text-slate-300 mb-6">Sistem Manajemen Les & Kursus Lengkap</p>
+                            <div class="flex justify-center gap-6 mb-8">
+                                <a href="#" class="text-slate-300 hover:text-white"><i class="fab fa-whatsapp"></i></a>
+                                <a href="#" class="text-slate-300 hover:text-white"><i class="fab fa-instagram"></i></a>
+                                <a href="#" class="text-slate-300 hover:text-white"><i class="fab fa-facebook"></i></a>
+                                <a href="#" class="text-slate-300 hover:text-white"><i class="fab fa-youtube"></i></a>
+                            </div>
+                            <p class="text-slate-400 text-sm">© 2024 EduMaster. All rights reserved.</p>
+                        </div>
+                    </footer>
+                </div>
+            `;
+        }
+
+        function scrollToFeatures() {
+            document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // =============================================
+        // REGISTRATION SYSTEM
+        // =============================================
+        function renderRegistration() {
+            document.getElementById('app').innerHTML = `
+                <div class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 p-4 md:p-8 fade-in">
+                    <div class="max-w-6xl mx-auto">
+                        <!-- Progress Steps -->
+                        <div class="flex justify-center mb-12">
+                            ${['Data Diri', 'Pilih Program', 'Konfirmasi'].map((step, idx) => `
+                                <div class="flex items-center">
+                                    <div class="w-10 h-10 rounded-full ${idx === 0 ? 'bg-kidBlue text-white' : 'bg-white text-slate-400'} border-2 ${idx === 0 ? 'border-kidBlue' : 'border-slate-200'} flex items-center justify-center font-bold">
+                                        ${idx + 1}
+                                    </div>
+                                    <div class="ml-2 font-bold ${idx === 0 ? 'text-kidBlue' : 'text-slate-400'}">${step}</div>
+                                    ${idx < 2 ? '<div class="w-12 h-1 bg-slate-200 mx-4"></div>' : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <!-- Program Selection -->
+                            <div class="lg:col-span-2">
+                                <h2 class="text-3xl font-black text-slate-800 mb-6">Pilih Program Les</h2>
+                                <p class="text-slate-600 mb-8">Anda bisa memilih lebih dari satu program</p>
+                                
+                                <div class="space-y-6">
+                                    ${DB.programs.map(program => `
+                                        <div class="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden">
+                                            <div class="p-6 border-b border-slate-100">
+                                                <div class="flex items-center justify-between mb-4">
+                                                    <div>
+                                                        <h3 class="text-xl font-black text-slate-800">${program.name}</h3>
+                                                        <p class="text-slate-500 text-sm">${program.category} • ${program.age_group}</p>
+                                                    </div>
+                                                    <button onclick="toggleProgram('${program.id}')" 
+                                                        class="px-4 py-2 rounded-lg ${selectedPrograms.includes(program.id) ? 'bg-kidGreen text-white' : 'bg-slate-100 text-slate-700'} font-bold">
+                                                        ${selectedPrograms.includes(program.id) ? '✓ Terpilih' : 'Pilih'}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Packages -->
+                                            <div class="p-6 bg-slate-50">
+                                                <h4 class="font-bold text-slate-700 mb-4">Pilihan Paket:</h4>
+                                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                    ${program.packages.map(pkg => `
+                                                        <div class="bg-white p-4 rounded-xl border-2 ${selectedPrograms.includes(program.id) ? 'border-kidBlue' : 'border-slate-200'}">
+                                                            <div class="flex justify-between items-start mb-2">
+                                                                <h5 class="font-bold text-slate-800">${pkg.name}</h5>
+                                                                <span class="bg-green-100 text-green-600 px-3 py-1 rounded-full text-sm font-bold">
+                                                                    ${formatRupiah(pkg.price)}
+                                                                </span>
+                                                            </div>
+                                                            <p class="text-sm text-slate-500 mb-3">${pkg.duration}</p>
+                                                            ${pkg.features ? `
+                                                                <ul class="text-xs text-slate-600 space-y-1">
+                                                                    ${pkg.features.map(f => `<li>✓ ${f}</li>`).join('')}
+                                                                </ul>
+                                                            ` : ''}
+                                                            <button onclick="selectPackage('${program.id}', '${pkg.id}')" 
+                                                                class="mt-3 w-full py-2 text-sm font-bold ${selectedPrograms.includes(program.id) ? 'bg-kidBlue text-white' : 'bg-slate-100 text-slate-700'} rounded-lg">
+                                                                Pilih Paket Ini
+                                                            </button>
+                                                        </div>
+                                                    `).join('')}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- Registration Form -->
+                            <div class="lg:col-span-1">
+                                <div class="bg-white rounded-2xl shadow-xl p-6 sticky top-6">
+                                    <h3 class="text-2xl font-black text-slate-800 mb-6">Form Pendaftaran</h3>
+                                    
+                                    <form id="registrationForm" onsubmit="handleRegistration(event)" class="space-y-4">
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-600 mb-2">Nama Lengkap</label>
+                                            <input type="text" name="name" required 
+                                                class="input-field" placeholder="Nama siswa">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-600 mb-2">Email</label>
+                                            <input type="email" name="email" required 
+                                                class="input-field" placeholder="email@contoh.com">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-600 mb-2">Nomor Telepon/WA</label>
+                                            <input type="tel" name="phone" required 
+                                                class="input-field" placeholder="0812-3456-7890">
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-600 mb-2">Jenis Kelamin</label>
+                                            <select name="gender" class="input-field">
+                                                <option value="">Pilih...</option>
+                                                <option value="male">Laki-laki</option>
+                                                <option value="female">Perempuan</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-600 mb-2">Jenjang Pendidikan</label>
+                                            <select name="grade" class="input-field">
+                                                <option value="">Pilih...</option>
+                                                <option>PAUD/TK</option>
+                                                <option>SD</option>
+                                                <option>SMP</option>
+                                                <option>SMA</option>
+                                                <option>Mahasiswa</option>
+                                                <option>Umum/Dewasa</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-600 mb-2">Alamat</label>
+                                            <textarea name="address" rows="3" 
+                                                class="input-field" placeholder="Alamat lengkap"></textarea>
+                                        </div>
+                                        
+                                        <div>
+                                            <label class="block text-sm font-bold text-slate-600 mb-2">Password</label>
+                                            <input type="password" name="password" required 
+                                                class="input-field" placeholder="Minimal 6 karakter">
+                                        </div>
+                                        
+                                        <!-- Selected Programs -->
+                                        <div id="selectedProgramsDisplay" class="bg-blue-50 p-4 rounded-xl">
+                                            <h4 class="font-bold text-blue-800 mb-2">Program Terpilih:</h4>
+                                            <div id="selectedProgramsList" class="space-y-2">
+                                                ${selectedPrograms.length === 0 ? 
+                                                    '<p class="text-slate-500 text-sm">Belum ada program terpilih</p>' : 
+                                                    selectedPrograms.map(pid => {
+                                                        const program = DB.programs.find(p => p.id === pid);
+                                                        return `<div class="text-sm bg-white p-2 rounded">✓ ${program?.name}</div>`;
+                                                    }).join('')}
+                                            </div>
+                                        </div>
+                                        
+                                        <button type="submit" 
+                                            class="w-full py-4 bg-gradient-to-r from-kidGreen to-emerald-500 text-white font-black rounded-xl text-lg shadow-lg hover:shadow-xl transition-all">
+                                            <i class="fas fa-check-circle mr-2"></i> DAFTAR SEKARANG
+                                        </button>
+                                        
+                                        <button type="button" onclick="currentView='landing'; renderCurrentView()" 
+                                            class="w-full text-center text-slate-500 font-bold hover:text-slate-700">
+                                            Kembali ke Beranda
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function toggleProgram(programId) {
+            if (selectedPrograms.includes(programId)) {
+                selectedPrograms = selectedPrograms.filter(id => id !== programId);
+            } else {
+                selectedPrograms.push(programId);
+            }
+            renderRegistration();
+        }
+
+        function selectPackage(programId, packageId) {
+            // Logika untuk memilih paket spesifik
+            console.log(`Program ${programId}, Paket ${packageId} dipilih`);
+            showToast('Paket berhasil dipilih', 'success');
+        }
+
+        async function handleRegistration(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            if (selectedPrograms.length === 0) {
+                showToast('Pilih minimal satu program', 'warning');
+                return;
+            }
+            
+            showLoading(true);
+            
+            // Simpan data ke "database"
+            const studentId = generateStudentId();
+            const newStudent = {
+                id: studentId,
+                name: data.name,
+                email: data.email,
+                phone: data.phone,
+                password: data.password,
+                role: 'student',
+                grade: data.grade,
+                gender: data.gender,
+                address: data.address,
+                programs: selectedPrograms,
+                points: 100, // Bonus poin pendaftaran
+                status: 'active',
+                created_at: new Date().toISOString().split('T')[0],
+                avatar: data.name.charAt(0).toUpperCase()
+            };
+            
+            DB.students.push(newStudent);
+            
+            // Buat akun parent otomatis
+            const parentId = 'PAR-' + studentId;
+            DB.students.push({
+                id: parentId,
+                name: 'Orang Tua ' + data.name,
+                email: data.email,
+                phone: data.phone,
+                password: 'parent' + Math.random().toString(36).slice(2, 8),
+                role: 'parent',
+                child_id: studentId,
+                status: 'active',
+                created_at: new Date().toISOString().split('T')[0],
+                avatar: 'P'
+            });
+            
+            // Tambahkan transaksi pendaftaran
+            const totalAmount = selectedPrograms.length * 150000; // Simulasi biaya
+            DB.finance.transactions.push({
+                id: Date.now(),
+                date: new Date().toISOString().split('T')[0],
+                description: `Pendaftaran ${data.name}`,
+                type: 'in',
+                amount: totalAmount,
+                method: 'pending'
+            });
+            
+            // Simpan ke localStorage
+            saveData();
+            
+            // Generate kartu siswa
+            showLoading(false);
+            generateStudentCard(newStudent, parentId);
+        }
+
+        function generateStudentCard(student, parentId) {
+            const cardHtml = `
+                <div class="min-h-screen bg-gradient-to-br from-blue-900 to-purple-900 flex items-center justify-center p-4 fade-in">
+                    <div class="max-w-md w-full">
+                        <div class="text-center mb-8">
+                            <h2 class="text-3xl font-black text-white mb-2">Pendaftaran Berhasil!</h2>
+                            <p class="text-blue-200">Akun Anda sudah aktif. Simpan kartu siswa berikut:</p>
+                        </div>
+                        
+                        <!-- Kartu Siswa -->
+                        <div id="studentCard" class="bg-gradient-to-br from-white to-slate-50 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
+                            <!-- Background Decoration -->
+                            <div class="absolute -top-20 -right-20 w-40 h-40 bg-kidBlue/10 rounded-full blur-3xl"></div>
+                            <div class="absolute -bottom-20 -left-20 w-40 h-40 bg-kidPink/10 rounded-full blur-3xl"></div>
+                            
+                            <!-- Header Card -->
+                            <div class="flex justify-between items-start mb-8 relative z-10">
+                                <div>
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div class="w-10 h-10 rounded-xl kids-gradient flex items-center justify-center">
+                                            <i class="fas fa-graduation-cap text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h3 class="font-black text-xl text-slate-800">EduMaster</h3>
+                                            <p class="text-xs text-slate-500">Kartu Member</p>
+                                        </div>
+                                    </div>
+                                    <div class="inline-block bg-kidYellow text-slate-800 text-xs font-black px-3 py-1 rounded-full">
+                                        AKTIF
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-sm text-slate-500">ID Siswa</div>
+                                    <div class="font-mono font-black text-slate-800">${student.id}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Student Info -->
+                            <div class="text-center mb-8 relative z-10">
+                                <div class="w-24 h-24 rounded-full bg-gradient-to-r from-kidBlue to-blue-500 mx-auto mb-4 flex items-center justify-center text-white text-3xl font-black border-4 border-white shadow-lg">
+                                    ${student.avatar}
+                                </div>
+                                <h2 class="text-2xl font-black text-slate-800">${student.name}</h2>
+                                <p class="text-slate-500">${student.grade || 'Siswa'}</p>
+                            </div>
+                            
+                            <!-- Program Info -->
+                            <div class="bg-slate-100 rounded-xl p-4 mb-6 relative z-10">
+                                <h4 class="font-bold text-slate-700 mb-2">Program Terdaftar:</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    ${selectedPrograms.map(pid => {
+                                        const program = DB.programs.find(p => p.id === pid);
+                                        return program ? `<span class="bg-white px-3 py-1 rounded-full text-xs font-bold text-slate-700">${program.name}</span>` : '';
+                                    }).join('')}
+                                </div>
+                            </div>
+                            
+                            <!-- Credentials -->
+                            <div class="grid grid-cols-2 gap-4 text-sm relative z-10">
+                                <div class="bg-blue-50 p-3 rounded-lg">
+                                    <div class="text-blue-600 font-bold">ID Login</div>
+                                    <div class="font-mono">${student.id}</div>
+                                </div>
+                                <div class="bg-green-50 p-3 rounded-lg">
+                                    <div class="text-green-600 font-bold">ID Orang Tua</div>
+                                    <div class="font-mono">${parentId}</div>
+                                </div>
+                            </div>
+                            
+                            <!-- QR Code Placeholder -->
+                            <div class="text-center mt-6 relative z-10">
+                                <div class="inline-block p-2 bg-white rounded-lg">
+                                    <div class="w-24 h-24 bg-slate-200 rounded flex items-center justify-center">
+                                        <i class="fas fa-qrcode text-slate-400 text-2xl"></i>
+                                    </div>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-2">Scan untuk verifikasi kehadiran</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div class="mt-8 grid grid-cols-2 gap-4">
+                            <button onclick="downloadStudentCard('${student.name}')" 
+                                class="bg-white text-slate-800 font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:bg-slate-50">
+                                <i class="fas fa-download"></i> Simpan Kartu
+                            </button>
+                            <button onclick="currentView='login'; renderCurrentView()" 
+                                class="bg-kidBlue text-white font-bold py-3 rounded-xl hover:bg-blue-500">
+                                Login Sekarang
+                            </button>
+                        </div>
+                        
+                        <div class="text-center mt-6">
+                            <button onclick="renderRegistration()" 
+                                class="text-blue-300 hover:text-white text-sm">
+                                Daftarkan Siswa Lain
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('app').innerHTML = cardHtml;
+        }
+
+        function downloadStudentCard(studentName) {
+            const card = document.getElementById('studentCard');
+            html2canvas(card, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Kartu_Siswa_${studentName.replace(/\s+/g, '_')}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast('Kartu berhasil diunduh', 'success');
+            });
+        }
+
+        // =============================================
+        // LOGIN SYSTEM
+        // =============================================
+        function renderLogin() {
+            document.getElementById('app').innerHTML = `
+                <div class="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 flex items-center justify-center p-4 fade-in">
+                    <div class="max-w-md w-full">
+                        <div class="text-center mb-8">
+                            <div class="w-20 h-20 rounded-2xl kids-gradient mx-auto mb-4 flex items-center justify-center">
+                                <i class="fas fa-graduation-cap text-white text-3xl"></i>
+                            </div>
+                            <h1 class="text-3xl font-black text-slate-800">Selamat Datang</h1>
+                            <p class="text-slate-600">Masuk ke portal EduMaster</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-2xl shadow-xl p-8">
+                            <form onsubmit="handleLogin(event)" class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-600 mb-2">ID Pengguna / Email</label>
+                                    <input type="text" id="loginId" required 
+                                        class="input-field" placeholder="ID siswa atau email">
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-600 mb-2">Password</label>
+                                    <input type="password" id="loginPassword" required 
+                                        class="input-field" placeholder="Password Anda">
+                                </div>
+                                
+                                <div class="flex items-center justify-between">
+                                    <label class="flex items-center">
+                                        <input type="checkbox" class="rounded border-slate-300 text-kidBlue focus:ring-kidBlue">
+                                        <span class="ml-2 text-sm text-slate-600">Ingat saya</span>
+                                    </label>
+                                    <button type="button" class="text-sm text-kidBlue font-bold hover:underline">
+                                        Lupa password?
+                                    </button>
+                                </div>
+                                
+                                <button type="submit" 
+                                    class="w-full py-3 bg-gradient-to-r from-kidBlue to-blue-500 text-white font-bold rounded-xl text-lg hover:shadow-lg transition">
+                                    <i class="fas fa-sign-in-alt mr-2"></i> MASUK
+                                </button>
+                                
+                                <div class="text-center">
+                                    <p class="text-slate-500">Belum punya akun?</p>
+                                    <button type="button" onclick="currentView='register'; renderCurrentView()" 
+                                        class="text-kidBlue font-bold hover:underline">
+                                        Daftar sebagai siswa baru
+                                    </button>
+                                </div>
+                                
+                                <!-- Demo Accounts -->
+                                <div class="mt-6 pt-6 border-t border-slate-100">
+                                    <p class="text-sm text-slate-500 font-bold mb-2">Akun demo:</p>
+                                    <div class="space-y-1 text-sm">
+                                        <div class="flex justify-between">
+                                            <span>Admin:</span>
+                                            <span class="font-mono">admin / admin123</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Siswa:</span>
+                                            <span class="font-mono">S001 / 123456</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span>Orang Tua:</span>
+                                            <span class="font-mono">P001 / parent123</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <div class="text-center mt-6">
+                            <button onclick="currentView='landing'; renderCurrentView()" 
+                                class="text-slate-500 hover:text-slate-700">
+                                <i class="fas fa-arrow-left mr-2"></i> Kembali ke Beranda
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const loginId = document.getElementById('loginId').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Cari user di database
+            const user = DB.students.find(u => 
+                (u.id === loginId || u.email === loginId) && u.password === password
+            );
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('eduMasterCurrentUser', JSON.stringify(user));
+                showToast(`Selamat datang, ${user.name}!`, 'success');
+                
+                // Redirect berdasarkan role
+                if (user.role === 'admin') {
+                    currentView = 'admin_dashboard';
+                } else if (user.role === 'parent') {
+                    currentView = 'parent_dashboard';
+                } else {
+                    currentView = 'student_dashboard';
+                }
+                renderCurrentView();
+            } else {
+                showToast('ID atau password salah', 'error');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('eduMasterCurrentUser');
+            currentView = 'landing';
+            renderCurrentView();
+            showToast('Anda telah logout', 'info');
+        }
+
+        // =============================================
+        // ADMIN DASHBOARD
+        // =============================================
+        function renderAdminDashboard() {
+            // Hitung statistik
+            const totalStudents = DB.students.filter(s => s.role === 'student').length;
+            const totalParents = DB.students.filter(s => s.role === 'parent').length;
+            const totalMaterials = DB.materials.length;
+            const totalExams = DB.exams.length;
+            const totalRevenue = DB.finance.transactions
+                .filter(t => t.type === 'in')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            // Data untuk chart
+            const revenueData = {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun'],
+                datasets: [{
+                    label: 'Pendapatan (Juta)',
+                    data: [5, 8, 12, 10, 15, 18],
+                    borderColor: '#10B981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            };
+            
+            const programData = {
+                labels: DB.programs.map(p => p.name),
+                datasets: [{
+                    data: [30, 25, 20, 15, 10],
+                    backgroundColor: ['#38BDF8', '#34D399', '#A78BFA', '#F472B6', '#FBBF24']
+                }]
+            };
+            
+            document.getElementById('app').innerHTML = `
+                <div class="flex h-screen bg-slate-50">
+                    <!-- Sidebar -->
+                    <aside class="w-64 bg-gradient-to-b from-slate-800 to-slate-900 text-white flex-col hidden md:flex">
+                        <div class="p-6">
+                            <div class="flex items-center gap-3 mb-8">
+                                <div class="w-12 h-12 rounded-xl bg-kidBlue flex items-center justify-center">
+                                    <i class="fas fa-crown text-white text-xl"></i>
+                                </div>
+                                <div>
+                                    <h2 class="font-black text-lg">Admin Panel</h2>
+                                    <p class="text-slate-300 text-sm">${currentUser?.name}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <nav class="flex-1 p-4 space-y-1">
+                            ${[
+                                {id: 'admin_dashboard', icon: 'fa-chart-line', label: 'Dashboard', active: true},
+                                {id: 'admin_students', icon: 'fa-users', label: 'Manajemen Siswa'},
+                                {id: 'admin_materials', icon: 'fa-book', label: 'Materi & Modul'},
+                                {id: 'admin_exams', icon: 'fa-file-alt', label: 'Ujian & Try Out'},
+                                {id: 'admin_finance', icon: 'fa-wallet', label: 'Keuangan'},
+                                {id: 'admin_events', icon: 'fa-calendar', label: 'Event & Jadwal'},
+                                {id: 'admin_messages', icon: 'fa-comments', label: 'Pesan'},
+                                {id: 'admin_settings', icon: 'fa-cog', label: 'Pengaturan'}
+                            ].map(item => `
+                                <button onclick="currentView='${item.id}'; renderCurrentView()" 
+                                    class="w-full text-left p-3 rounded-lg ${currentView === item.id ? 'bg-kidBlue' : 'hover:bg-slate-700/50'} transition flex items-center gap-3">
+                                    <i class="fas ${item.icon} w-5"></i>
+                                    <span>${item.label}</span>
+                                    ${item.id === 'admin_messages' ? '<span class="ml-auto bg-red-500 text-xs px-2 py-1 rounded-full">3</span>' : ''}
+                                </button>
+                            `).join('')}
+                        </nav>
+                        
+                        <div class="p-4 border-t border-slate-700">
+                            <div class="flex items-center gap-3 mb-4">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center">
+                                    <i class="fas fa-user text-slate-300"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-bold">${currentUser?.name}</p>
+                                    <p class="text-xs text-slate-400">Administrator</p>
+                                </div>
+                            </div>
+                            <button onclick="logout()" 
+                                class="w-full p-3 rounded-lg hover:bg-red-500/20 text-red-300 flex items-center gap-3">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    </aside>
+                    
+                    <!-- Main Content -->
+                    <main class="flex-1 overflow-auto">
+                        <!-- Top Bar -->
+                        <div class="bg-white border-b border-slate-200 p-4 flex justify-between items-center">
+                            <div class="flex items-center gap-4">
+                                <button id="sidebarToggle" class="md:hidden text-slate-600">
+                                    <i class="fas fa-bars text-xl"></i>
+                                </button>
+                                <h1 class="text-xl font-black text-slate-800">Dashboard Admin</h1>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <button class="relative text-slate-600">
+                                    <i class="fas fa-bell text-xl"></i>
+                                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">3</span>
+                                </button>
+                                <div class="flex items-center gap-3">
+                                    <div class="text-right">
+                                        <p class="text-sm font-bold">${currentUser?.name}</p>
+                                        <p class="text-xs text-slate-500">Administrator</p>
+                                    </div>
+                                    <div class="w-10 h-10 rounded-full bg-kidBlue flex items-center justify-center text-white font-bold">
+                                        ${currentUser?.name?.charAt(0) || 'A'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Stats Cards -->
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                                ${[
+                                    {label: 'Total Siswa', value: totalStudents, icon: 'fa-users', color: 'bg-kidBlue', change: '+12%'},
+                                    {label: 'Total Pendapatan', value: formatRupiah(totalRevenue), icon: 'fa-wallet', color: 'bg-kidGreen', change: '+8%'},
+                                    {label: 'Materi Tersedia', value: totalMaterials, icon: 'fa-book', color: 'bg-kidPurple', change: '+5 baru'},
+                                    {label: 'Ujian Aktif', value: totalExams, icon: 'fa-file-alt', color: 'bg-kidPink', change: '2 aktif'}
+                                ].map(stat => `
+                                    <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 card-hover">
+                                        <div class="flex justify-between items-start">
+                                            <div>
+                                                <p class="text-slate-500 text-sm font-bold">${stat.label}</p>
+                                                <h3 class="text-2xl font-black text-slate-800 mt-2">${stat.value}</h3>
+                                                <p class="text-green-500 text-xs font-bold mt-1">
+                                                    <i class="fas fa-arrow-up"></i> ${stat.change}
+                                                </p>
+                                            </div>
+                                            <div class="${stat.color} w-12 h-12 rounded-xl flex items-center justify-center">
+                                                <i class="fas ${stat.icon} text-white text-xl"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <!-- Charts -->
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+                                <!-- Revenue Chart -->
+                                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                                    <h3 class="font-bold text-slate-700 mb-4">Trend Pendapatan 6 Bulan</h3>
+                                    <div class="h-64">
+                                        <canvas id="revenueChart"></canvas>
+                                    </div>
+                                </div>
+                                
+                                <!-- Program Distribution -->
+                                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                                    <h3 class="font-bold text-slate-700 mb-4">Distribusi Program</h3>
+                                    <div class="h-64">
+                                        <canvas id="programChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Recent Activity & Quick Actions -->
+                            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                                <!-- Recent Activity -->
+                                <div class="lg:col-span-2">
+                                    <div class="bg-white rounded-2xl p-6 shadow-sm">
+                                        <div class="flex justify-between items-center mb-6">
+                                            <h3 class="font-bold text-slate-700">Aktivitas Terbaru</h3>
+                                            <button class="text-sm text-kidBlue font-bold">Lihat Semua</button>
+                                        </div>
+                                        <div class="space-y-4">
+                                            ${[
+                                                {student: 'Budi Santoso', action: 'Mendaftar program Coding', time: '2 jam lalu', type: 'registration'},
+                                                {student: 'Siti Aminah', action: 'Menyelesaikan ujian Matematika', time: '5 jam lalu', type: 'exam'},
+                                                {student: 'Andi Wijaya', action: 'Mengupload tugas desain', time: '1 hari lalu', type: 'assignment'},
+                                                {student: 'Rina Melati', action: 'Melakukan pembayaran', time: '2 hari lalu', type: 'payment'}
+                                            ].map(activity => `
+                                                <div class="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg">
+                                                    <div class="w-10 h-10 rounded-full ${activity.type === 'registration' ? 'bg-blue-100 text-blue-600' : activity.type === 'exam' ? 'bg-green-100 text-green-600' : activity.type === 'assignment' ? 'bg-purple-100 text-purple-600' : 'bg-yellow-100 text-yellow-600'} flex items-center justify-center">
+                                                        <i class="fas ${activity.type === 'registration' ? 'fa-user-plus' : activity.type === 'exam' ? 'fa-file-alt' : activity.type === 'assignment' ? 'fa-upload' : 'fa-money-bill'}"></i>
+                                                    </div>
+                                                    <div class="flex-1">
+                                                        <p class="font-bold text-slate-700">${activity.student}</p>
+                                                        <p class="text-sm text-slate-500">${activity.action}</p>
+                                                    </div>
+                                                    <span class="text-xs font-bold text-slate-400">${activity.time}</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Quick Actions -->
+                                <div class="lg:col-span-1">
+                                    <div class="bg-white rounded-2xl p-6 shadow-sm">
+                                        <h3 class="font-bold text-slate-700 mb-6">Aksi Cepat</h3>
+                                        <div class="space-y-3">
+                                            ${[
+                                                {icon: 'fa-user-plus', label: 'Tambah Siswa', action: 'addStudent'},
+                                                {icon: 'fa-book-medical', label: 'Upload Materi', action: 'uploadMaterial'},
+                                                {icon: 'fa-file-alt', label: 'Buat Ujian', action: 'createExam'},
+                                                {icon: 'fa-calendar-plus', label: 'Jadwal Event', action: 'scheduleEvent'},
+                                                {icon: 'fa-chart-bar', label: 'Export Laporan', action: 'exportReport'}
+                                            ].map(action => `
+                                                <button onclick="handleAdminAction('${action.action}')" 
+                                                    class="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-kidBlue hover:bg-blue-50 flex items-center gap-3 transition">
+                                                    <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                                        <i class="fas ${action.icon} text-kidBlue"></i>
+                                                    </div>
+                                                    <span class="font-medium">${action.label}</span>
+                                                </button>
+                                            `).join('')}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+                </div>
+            `;
+            
+            // Initialize Charts
+            setTimeout(() => {
+                const revCtx = document.getElementById('revenueChart')?.getContext('2d');
+                if (revCtx) {
+                    new Chart(revCtx, {
+                        type: 'line',
+                        data: revenueData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: 'rgba(0,0,0,0.05)' }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                const progCtx = document.getElementById('programChart')?.getContext('2d');
+                if (progCtx) {
+                    new Chart(progCtx, {
+                        type: 'doughnut',
+                        data: programData,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'right' }
+                            }
+                        }
+                    });
+                }
+            }, 100);
+        }
+
+        function handleAdminAction(action) {
+            switch(action) {
+                case 'addStudent':
+                    showToast('Membuka form tambah siswa', 'info');
+                    // Implementasi: render form tambah siswa
+                    break;
+                case 'uploadMaterial':
+                    showToast('Membuka upload materi', 'info');
+                    currentView = 'admin_materials';
+                    renderCurrentView();
+                    break;
+                case 'createExam':
+                    showToast('Membuat ujian baru', 'info');
+                    currentView = 'admin_exams';
+                    renderCurrentView();
+                    break;
+                case 'scheduleEvent':
+                    showToast('Menjadwalkan event', 'info');
+                    break;
+                case 'exportReport':
+                    showToast('Mengekspor laporan', 'info');
+                    // Implementasi: generate PDF/Excel report
+                    break;
+            }
+        }
+
+        // =============================================
+        // STUDENT DASHBOARD
+        // =============================================
+        function renderStudentDashboard() {
+            const student = currentUser;
+            const studentPrograms = DB.programs.filter(p => 
+                student.programs?.includes(p.id)
+            );
+            
+            const attendancePercentage = student.total_meeting > 0 ? 
+                Math.round((student.attendance_count / student.total_meeting) * 100) : 0;
+            
+            const upcomingEvents = DB.events.filter(e => e.status === 'upcoming').slice(0, 3);
+            
+            document.getElementById('app').innerHTML = `
+                <div class="min-h-screen bg-slate-50 pb-20 md:pb-6">
+                    <!-- Top Bar -->
+                    <div class="bg-white sticky top-0 z-40 px-4 py-3 shadow-sm border-b border-slate-100 flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-gradient-to-r from-kidBlue to-blue-500 flex items-center justify-center text-white font-black text-xl">
+                                ${student.avatar}
+                            </div>
+                            <div>
+                                <h4 class="font-extrabold text-slate-800 leading-tight">${student.name}</h4>
+                                <div class="flex items-center gap-1">
+                                    <div class="text-xs font-bold text-kidGreen bg-green-50 px-2 py-0.5 rounded-full">
+                                        <i class="fas fa-star text-yellow-400"></i> ${student.points || 0} XP
+                                    </div>
+                                    <div class="text-xs font-bold text-kidBlue bg-blue-50 px-2 py-0.5 rounded-full">
+                                        Level ${Math.floor((student.points || 0) / 100) + 1}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="showNotifications()" class="relative text-slate-600">
+                                <i class="fas fa-bell text-xl"></i>
+                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">2</span>
+                            </button>
+                            <button onclick="logout()" class="w-8 h-8 rounded-full bg-red-50 text-red-400 flex items-center justify-center">
+                                <i class="fas fa-power-off"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Main Content -->
+                    <div class="p-4 max-w-6xl mx-auto">
+                        <!-- Welcome Card -->
+                        <div class="bg-gradient-to-r from-kidBlue to-blue-500 rounded-3xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                            <div class="relative z-10">
+                                <h2 class="text-2xl font-black mb-1">Halo, ${student.name.split(' ')[0]}! 👋</h2>
+                                <p class="font-medium opacity-90">Selamat belajar hari ini. Ayo raih bintang sebanyak-banyaknya!</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Stats Cards -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            ${[
+                                {label: 'Program', value: studentPrograms.length, icon: 'fa-book', color: 'bg-kidPurple'},
+                                {label: 'Materi', value: '12', icon: 'fa-file-alt', color: 'bg-kidGreen'},
+                                {label: 'Ujian', value: '3', icon: 'fa-graduation-cap', color: 'bg-kidPink'},
+                                {label: 'Kehadiran', value: `${attendancePercentage}%`, icon: 'fa-calendar-check', color: 'bg-kidYellow'}
+                            ].map(stat => `
+                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-12 h-12 ${stat.color} rounded-xl flex items-center justify-center">
+                                            <i class="fas ${stat.icon} text-white"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-2xl font-black text-slate-800">${stat.value}</p>
+                                            <p class="text-xs text-slate-500 font-bold">${stat.label}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <!-- My Programs & Quick Access -->
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+                            <!-- My Programs -->
+                            <div class="lg:col-span-2">
+                                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                                    <div class="flex justify-between items-center mb-6">
+                                        <h3 class="font-bold text-slate-800 text-lg">Program Saya</h3>
+                                        <button onclick="currentView='student_materials'; renderCurrentView()" class="text-sm text-kidBlue font-bold">
+                                            Lihat Semua
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        ${studentPrograms.slice(0, 4).map(program => `
+                                            <div class="border border-slate-200 rounded-xl p-4 hover:border-kidBlue transition">
+                                                <div class="flex items-start justify-between mb-3">
+                                                    <h4 class="font-bold text-slate-800">${program.name}</h4>
+                                                    <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-bold">
+                                                        Aktif
+                                                    </span>
+                                                </div>
+                                                <p class="text-sm text-slate-500 mb-4">${program.category}</p>
+                                                <div class="flex justify-between items-center">
+                                                    <span class="text-xs text-slate-400">Progress: 65%</span>
+                                                    <button onclick="openProgram('${program.id}')" class="text-sm text-kidBlue font-bold hover:underline">
+                                                        Lanjutkan →
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Quick Access -->
+                            <div class="lg:col-span-1">
+                                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100">
+                                    <h3 class="font-bold text-slate-800 text-lg mb-6">Akses Cepat</h3>
+                                    <div class="space-y-3">
+                                        ${[
+                                            {icon: 'fa-book-open', label: 'Perpustakaan', view: 'student_materials'},
+                                            {icon: 'fa-file-alt', label: 'Ujian & Try Out', view: 'student_exams'},
+                                            {icon: 'fa-calendar', label: 'Jadwal', view: 'student_schedule'},
+                                            {icon: 'fa-comments', label: 'Chat dengan Guru', view: 'student_chat'},
+                                            {icon: 'fa-user', label: 'Profil Saya', view: 'student_profile'}
+                                        ].map(item => `
+                                            <button onclick="currentView='${item.view}'; renderCurrentView()" 
+                                                class="w-full text-left p-3 rounded-lg border border-slate-200 hover:border-kidBlue hover:bg-blue-50 flex items-center gap-3 transition">
+                                                <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                                                    <i class="fas ${item.icon} text-kidBlue"></i>
+                                                </div>
+                                                <span class="font-medium">${item.label}</span>
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Upcoming Events -->
+                        <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 mb-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <h3 class="font-bold text-slate-800 text-lg">Event Mendatang</h3>
+                                <button class="text-sm text-kidBlue font-bold">Lihat Kalender</button>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                ${upcomingEvents.map(event => `
+                                    <div class="flex items-center gap-4 p-4 border border-slate-200 rounded-xl hover:border-kidBlue transition">
+                                        <div class="w-12 h-12 rounded-xl ${event.type === 'tryout' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'} flex items-center justify-center">
+                                            <i class="fas ${event.type === 'tryout' ? 'fa-clock' : 'fa-users'}"></i>
+                                        </div>
+                                        <div class="flex-1">
+                                            <h4 class="font-bold text-slate-800">${event.title}</h4>
+                                            <p class="text-sm text-slate-500">${formatDate(event.date)} • ${event.time}</p>
+                                        </div>
+                                        <button onclick="viewEvent('${event.id}')" class="px-4 py-2 bg-slate-100 text-slate-700 rounded-lg text-sm font-bold hover:bg-kidBlue hover:text-white transition">
+                                            Detail
+                                        </button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bottom Navigation -->
+                    <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 p-2 flex justify-around items-center z-50 md:hidden">
+                        ${[
+                            {view: 'student_dashboard', icon: 'fa-home', label: 'Beranda'},
+                            {view: 'student_materials', icon: 'fa-book', label: 'Materi'},
+                            {view: 'student_exams', icon: 'fa-file-alt', label: 'Ujian'},
+                            {view: 'student_schedule', icon: 'fa-calendar', label: 'Jadwal'},
+                            {view: 'student_chat', icon: 'fa-comments', label: 'Chat'}
+                        ].map(item => `
+                            <button onclick="currentView='${item.view}'; renderCurrentView()" 
+                                class="flex flex-col items-center gap-1 p-2 rounded-xl transition w-16 ${currentView === item.view ? 'bg-blue-50' : ''}">
+                                <i class="fas ${item.icon} text-xl ${currentView === item.view ? 'text-kidBlue' : 'text-slate-400'}"></i>
+                                <span class="text-[10px] font-bold ${currentView === item.view ? 'text-slate-700' : 'text-slate-400'}">${item.label}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function openProgram(programId) {
+            currentView = 'student_materials';
+            renderCurrentView();
+            showToast('Membuka materi program', 'info');
+        }
+
+        function viewEvent(eventId) {
+            currentView = 'event_detail';
+            renderCurrentView();
+        }
+
+        // =============================================
+        // MATERIAL LIBRARY
+        // =============================================
+        function renderMaterialLibrary() {
+            const categories = [...new Set(DB.materials.map(m => m.category))];
+            
+            document.getElementById('app').innerHTML = `
+                <div class="min-h-screen bg-slate-50 pb-20">
+                    <!-- Header -->
+                    <div class="bg-white sticky top-0 z-40 px-4 py-3 border-b border-slate-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h1 class="text-xl font-black text-slate-800">Perpustakaan Digital</h1>
+                                <p class="text-slate-500 text-sm">${DB.materials.length} materi tersedia</p>
+                            </div>
+                            <button onclick="currentView='student_dashboard'; renderCurrentView()" 
+                                class="md:hidden text-slate-600">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Search & Filter -->
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="relative flex-1">
+                                <input type="text" placeholder="Cari materi, video, atau soal..." 
+                                    class="w-full pl-12 pr-4 py-3 rounded-xl border border-slate-200 focus:border-kidBlue outline-none">
+                                <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                            </div>
+                            <select class="px-4 py-3 rounded-xl border border-slate-200 bg-white">
+                                <option>Semua Kategori</option>
+                                ${categories.map(cat => `<option>${cat}</option>`).join('')}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Categories -->
+                    <div class="p-4">
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <button class="px-4 py-2 rounded-full bg-kidBlue text-white font-bold text-sm">
+                                Semua
+                            </button>
+                            ${['Video', 'PDF', 'Game', 'Quiz', 'Tutorial', 'Simulasi'].map(cat => `
+                                <button class="px-4 py-2 rounded-full border-2 border-slate-200 hover:border-kidBlue hover:bg-kidBlue hover:text-white font-bold text-sm transition">
+                                    ${cat}
+                                </button>
+                            `).join('')}
+                        </div>
+                        
+                        <!-- Materials Grid -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            ${DB.materials.map((material, idx) => `
+                                <div class="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-shadow border border-slate-100 card-hover">
+                                    <!-- Thumbnail -->
+                                    <div class="h-48 bg-gradient-to-r ${material.type === 'video' ? 'from-blue-400 to-blue-600' : material.type === 'game' ? 'from-green-400 to-green-600' : 'from-purple-400 to-purple-600'} relative">
+                                        <div class="absolute top-4 left-4 bg-white/90 text-slate-800 text-xs font-bold px-3 py-1 rounded-full">
+                                            ${material.type.toUpperCase()}
+                                        </div>
+                                        <div class="absolute bottom-4 right-4 text-white text-2xl">
+                                            <i class="fas ${material.icon}"></i>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Content -->
+                                    <div class="p-6">
+                                        <h3 class="font-bold text-lg text-slate-800 mb-2 line-clamp-2">${material.title}</h3>
+                                        <p class="text-slate-600 text-sm mb-4 line-clamp-2">${material.description}</p>
+                                        
+                                        <div class="flex items-center justify-between mb-4">
+                                            <span class="text-xs font-bold text-slate-500 bg-slate-100 px-3 py-1 rounded-full">
+                                                ${material.category}
+                                            </span>
+                                            <span class="text-xs font-bold text-yellow-600">
+                                                <i class="fas fa-star"></i> ${material.points} XP
+                                            </span>
+                                        </div>
+                                        
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-sm text-slate-500">
+                                                <i class="fas fa-clock"></i> ${material.duration}
+                                            </span>
+                                            <button onclick="openMaterial('${material.id}')" 
+                                                class="px-4 py-2 bg-kidBlue text-white text-sm font-bold rounded-lg hover:bg-blue-500 transition">
+                                                Buka Materi
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function openMaterial(materialId) {
+            const material = DB.materials.find(m => m.id === materialId);
+            if (material) {
+                // Tambah poin untuk siswa yang membuka materi
+                if (currentUser && currentUser.role === 'student') {
+                    currentUser.points = (currentUser.points || 0) + APP_CONFIG.pointPerMaterial;
+                    saveData();
+                    showToast(`+${APP_CONFIG.pointPerMaterial} XP untuk membuka materi!`, 'success');
+                }
+                
+                currentView = 'material_detail';
+                renderCurrentView();
+            }
+        }
+
+        // =============================================
+        // EXAM SYSTEM
+        // =============================================
+        function renderStudentExams() {
+            document.getElementById('app').innerHTML = `
+                <div class="min-h-screen bg-slate-50 pb-20">
+                    <!-- Header -->
+                    <div class="bg-white sticky top-0 z-40 px-4 py-3 border-b border-slate-100">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h1 class="text-xl font-black text-slate-800">Ujian & Try Out</h1>
+                                <p class="text-slate-500 text-sm">Latih kemampuan Anda dengan berbagai jenis ujian</p>
+                            </div>
+                            <button onclick="currentView='student_dashboard'; renderCurrentView()" 
+                                class="md:hidden text-slate-600">
+                                <i class="fas fa-arrow-left"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Exam Types -->
+                    <div class="p-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                            ${[
+                                {type: 'quiz', title: 'Kuis Harian', desc: 'Tes pemahaman materi harian', color: 'bg-kidBlue', icon: 'fa-question-circle'},
+                                {type: 'tryout', title: 'Try Out', desc: 'Simulasi ujian sebenarnya', color: 'bg-kidGreen', icon: 'fa-clipboard-check'},
+                                {type: 'simulation', title: 'Simulasi CAT', desc: 'Tes computer assisted test', color: 'bg-kidPurple', icon: 'fa-desktop'},
+                                {type: 'game', title: 'Game Edukasi', desc: 'Belajar sambil bermain', color: 'bg-kidPink', icon: 'fa-gamepad'},
+                                {type: 'drill', title: 'Smart Drill', desc: 'Latihan soal bertingkat', color: 'bg-kidYellow', icon: 'fa-bolt'},
+                                {type: 'assessment', title: 'Assesmen', desc: 'Evaluasi kemampuan', color: 'bg-kidOrange', icon: 'fa-chart-bar'}
+                            ].map(examType => `
+                                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-100 card-hover">
+                                    <div class="${examType.color} w-14 h-14 rounded-xl flex items-center justify-center mb-4">
+                                        <i class="fas ${examType.icon} text-white text-xl"></i>
+                                    </div>
+                                    <h3 class="font-bold text-lg text-slate-800 mb-2">${examType.title}</h3>
+                                    <p class="text-slate-600 text-sm mb-4">${examType.desc}</p>
+                                    <button class="text-kidBlue font-bold hover:underline">
+                                        Lihat Daftar →
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <!-- Available Exams -->
+                        <h2 class="text-xl font-black text-slate-800 mb-4">Ujian Tersedia</h2>
+                        <div class="space-y-4">
+                            ${DB.exams.map(exam => `
+                                <div class="bg-white border-2 border-slate-100 rounded-2xl p-6 hover:border-kidBlue transition">
+                                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div>
+                                            <h3 class="font-bold text-lg text-slate-800 mb-1">${exam.title}</h3>
+                                            <p class="text-slate-600 text-sm mb-2">${exam.description}</p>
+                                            <div class="flex flex-wrap gap-2">
+                                                <span class="text-xs bg-blue-100 text-blue-600 px-3 py-1 rounded-full font-bold">
+                                                    ${exam.type.toUpperCase()}
+                                                </span>
+                                                <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-bold">
+                                                    ${exam.questions.length} Soal
+                                                </span>
+                                                <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-bold">
+                                                    ${Math.floor(exam.duration/60)} Menit
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button onclick="viewExamDetails('${exam.id}')" 
+                                                class="px-4 py-2 border border-slate-200 text-slate-700 rounded-lg font-bold hover:bg-slate-50">
+                                                Detail
+                                            </button>
+                                            <button onclick="startExam('${exam.id}')" 
+                                                class="px-6 py-2 bg-kidBlue text-white rounded-lg font-bold hover:bg-blue-500">
+                                                Mulai
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function startExam(examId) {
+            const exam = DB.exams.find(e => e.id === examId);
+            if (!exam) return;
+            
+            examSession = {
+                examId,
+                startTime: Date.now(),
+                answers: [],
+                currentQuestion: 0,
+                timeRemaining: exam.duration * 60 // dalam detik
+            };
+            
+            currentView = 'exam_session';
+            renderCurrentView();
+            
+            // Start timer
+            const timerInterval = setInterval(() => {
+                if (examSession) {
+                    examSession.timeRemaining--;
+                    updateExamTimer();
+                    
+                    if (examSession.timeRemaining <= 0) {
+                        clearInterval(timerInterval);
+                        finishExam();
+                    }
+                }
+            }, 1000);
+        }
+
+        function renderExamSession() {
+            if (!examSession) {
+                currentView = 'student_exams';
+                renderCurrentView();
+                return;
+            }
+            
+            const exam = DB.exams.find(e => e.id === examSession.examId);
+            if (!exam || examSession.currentQuestion >= exam.questions.length) {
+                finishExam();
+                return;
+            }
+            
+            const question = exam.questions[examSession.currentQuestion];
+            const minutes = Math.floor(examSession.timeRemaining / 60);
+            const seconds = examSession.timeRemaining % 60;
+            
+            document.getElementById('app').innerHTML = `
+                <div class="min-h-screen bg-slate-50">
+                    <!-- Exam Header -->
+                    <div class="bg-white sticky top-0 z-40 px-4 py-3 border-b border-slate-100 flex justify-between items-center">
+                        <div>
+                            <h1 class="font-black text-slate-800">${exam.title}</h1>
+                            <p class="text-sm text-slate-500">Soal ${examSession.currentQuestion + 1} dari ${exam.questions.length}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-mono font-black ${examSession.timeRemaining < 300 ? 'text-red-500' : 'text-slate-800'}">
+                                ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}
+                            </div>
+                            <div class="text-xs text-slate-500">Sisa Waktu</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Question -->
+                    <div class="max-w-3xl mx-auto p-4">
+                        <div class="bg-white rounded-2xl shadow-lg p-6 mb-6">
+                            <h2 class="text-lg font-bold text-slate-800 mb-6">${question.question}</h2>
+                            
+                            <div class="space-y-3">
+                                ${question.options.map((option, idx) => `
+                                    <button onclick="selectExamAnswer(${idx})" 
+                                        class="w-full text-left p-4 rounded-xl border-2 border-slate-100 hover:border-kidBlue hover:bg-blue-50 font-medium text-slate-700 exam-option">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-lg border border-slate-200 flex items-center justify-center font-bold">
+                                                ${String.fromCharCode(65 + idx)}
+                                            </div>
+                                            <span>${option}</span>
+                                        </div>
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Navigation -->
+                        <div class="flex justify-between">
+                            <button onclick="prevQuestion()" 
+                                class="px-6 py-3 border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 ${examSession.currentQuestion === 0 ? 'opacity-50 cursor-not-allowed' : ''}">
+                                <i class="fas fa-arrow-left mr-2"></i> Sebelumnya
+                            </button>
+                            
+                            <div class="flex gap-2">
+                                ${exam.questions.map((_, idx) => `
+                                    <button onclick="goToQuestion(${idx})" 
+                                        class="w-10 h-10 rounded-lg ${idx === examSession.currentQuestion ? 'bg-kidBlue text-white' : examSession.answers[idx] !== undefined ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-600'} font-bold">
+                                        ${idx + 1}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            
+                            <button onclick="nextQuestion()" 
+                                class="px-6 py-3 bg-kidBlue text-white rounded-xl font-bold hover:bg-blue-500">
+                                ${examSession.currentQuestion === exam.questions.length - 1 ? 'Selesai' : 'Berikutnya'} 
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectExamAnswer(answerIndex) {
+            if (!examSession) return;
+            
+            const exam = DB.exams.find(e => e.id === examSession.examId);
+            if (!exam) return;
+            
+            examSession.answers[examSession.currentQuestion] = answerIndex;
+            
+            // Update UI untuk menunjukkan jawaban terpilih
+            document.querySelectorAll('.exam-option').forEach((btn, idx) => {
+                btn.classList.toggle('selected', idx === answerIndex);
+            });
+        }
+
+        function nextQuestion() {
+            if (!examSession) return;
+            
+            const exam = DB.exams.find(e => e.id === examSession.examId);
+            if (!exam) return;
+            
+            if (examSession.currentQuestion < exam.questions.length - 1) {
+                examSession.currentQuestion++;
+                renderExamSession();
+            } else {
+                finishExam();
+            }
+        }
+
+        function prevQuestion() {
+            if (!examSession || examSession.currentQuestion === 0) return;
+            
+            examSession.currentQuestion--;
+            renderExamSession();
+        }
+
+        function goToQuestion(index) {
+            if (!examSession) return;
+            
+            const exam = DB.exams.find(e => e.id === examSession.examId);
+            if (!exam || index < 0 || index >= exam.questions.length) return;
+            
+            examSession.currentQuestion = index;
+            renderExamSession();
+        }
+
+        function updateExamTimer() {
+            const timerEl = document.querySelector('.text-2xl.font-mono');
+            if (timerEl && examSession) {
+                const minutes = Math.floor(examSession.timeRemaining / 60);
+                const seconds = examSession.timeRemaining % 60;
+                timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                if (examSession.timeRemaining < 300) { // Kurang dari 5 menit
+                    timerEl.classList.add('text-red-500');
+                    timerEl.classList.remove('text-slate-800');
+                }
+            }
+        }
+
+        function finishExam() {
+            if (!examSession) return;
+            
+            const exam = DB.exams.find(e => e.id === examSession.examId);
+            if (!exam) return;
+            
+            // Hitung skor
+            let score = 0;
+            let correctAnswers = 0;
+            
+            exam.questions.forEach((question, idx) => {
+                if (examSession.answers[idx] === question.answer) {
+                    score += question.points;
+                    correctAnswers++;
+                }
+            });
+            
+            const totalScore = (score / (exam.questions.length * 10)) * 100;
+            const passed = totalScore >= exam.passing_score;
+            
+            // Tambah poin untuk siswa
+            if (currentUser && currentUser.role === 'student') {
+                currentUser.points = (currentUser.points || 0) + (passed ? APP_CONFIG.pointPerExam : 10);
+                saveData();
+            }
+            
+            // Tampilkan hasil
+            document.getElementById('app').innerHTML = `
+                <div class="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full">
+                        <div class="text-center mb-8">
+                            <div class="w-20 h-20 rounded-full ${passed ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'} flex items-center justify-center mx-auto mb-4">
+                                <i class="fas ${passed ? 'fa-trophy' : 'fa-redo'} text-3xl"></i>
+                            </div>
+                            <h2 class="text-2xl font-black text-slate-800 mb-2">${passed ? 'Selamat!' : 'Coba Lagi'}</h2>
+                            <p class="text-slate-600">Anda telah menyelesaikan ujian</p>
+                        </div>
+                        
+                        <div class="space-y-4 mb-8">
+                            <div class="flex justify-between items-center p-4 bg-slate-50 rounded-xl">
+                                <span class="font-medium">Skor Anda</span>
+                                <span class="text-2xl font-black ${passed ? 'text-green-600' : 'text-red-600'}">${totalScore.toFixed(1)}%</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center p-4 bg-slate-50 rounded-xl">
+                                <span class="font-medium">Jawaban Benar</span>
+                                <span class="text-xl font-black text-slate-800">${correctAnswers}/${exam.questions.length}</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center p-4 bg-slate-50 rounded-xl">
+                                <span class="font-medium">Status</span>
+                                <span class="font-bold ${passed ? 'text-green-600' : 'text-red-600'}">
+                                    ${passed ? 'LULUS' : 'TIDAK LULUS'}
+                                </span>
+                            </div>
+                            
+                            ${passed ? `
+                                <div class="p-4 bg-green-50 rounded-xl">
+                                    <p class="text-green-700 font-bold text-center">
+                                        <i class="fas fa-star mr-2"></i>
+                                        Anda mendapatkan +${APP_CONFIG.pointPerExam} XP!
+                                    </p>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="space-y-3">
+                            <button onclick="currentView='student_exams'; examSession=null; renderCurrentView()" 
+                                class="w-full py-3 bg-kidBlue text-white font-bold rounded-xl hover:bg-blue-500">
+                                Kembali ke Daftar Ujian
+                            </button>
+                            
+                            <button onclick="currentView='student_dashboard'; examSession=null; renderCurrentView()" 
+                                class="w-full py-3 border border-slate-200 text-slate-700 font-bold rounded-xl hover:bg-slate-50">
+                                Ke Dashboard
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            examSession = null;
+        }
+
+        // =============================================
+        // PARENT DASHBOARD
+        // =============================================
+        function renderParentDashboard() {
+            const parent = currentUser;
+            const child = DB.students.find(s => s.id === parent.child_id);
+            
+            if (!child) {
+                showToast('Data anak tidak ditemukan', 'error');
+                logout();
+                return;
+            }
+            
+            const childPrograms = DB.programs.filter(p => 
+                child.programs?.includes(p.id)
+            );
+            
+            const attendancePercentage = child.total_meeting > 0 ? 
+                Math.round((child.attendance_count / child.total_meeting) * 100) : 0;
+            
+            document.getElementById('app').innerHTML = `
+                <div class="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
+                    <!-- Header -->
+                    <div class="bg-white p-4 shadow-sm flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-orange-100 p-3 rounded-xl text-orange-600">
+                                <i class="fas fa-user-tie text-xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-bold text-slate-800">Portal Orang Tua</h2>
+                                <p class="text-sm text-slate-500">Monitor perkembangan belajar anak</p>
+                            </div>
+                        </div>
+                        <button onclick="logout()" class="text-red-500 font-bold hover:text-red-700">
+                            <i class="fas fa-sign-out-alt mr-2"></i> Keluar
+                        </button>
+                    </div>
+                    
+                    <!-- Child Info -->
+                    <div class="p-6 max-w-6xl mx-auto">
+                        <div class="bg-gradient-to-r from-orange-400 to-amber-400 rounded-3xl p-6 text-white shadow-lg mb-6 relative overflow-hidden">
+                            <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+                            <div class="relative z-10">
+                                <div class="flex items-center gap-4 mb-4">
+                                    <div class="w-20 h-20 rounded-full bg-white flex items-center justify-center text-orange-500 text-2xl font-black">
+                                        ${child.avatar}
+                                    </div>
+                                    <div>
+                                        <h3 class="text-2xl font-black">${child.name}</h3>
+                                        <p class="opacity-90">${child.grade || 'Siswa'}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Stats -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                            ${[
+                                {label: 'Program Aktif', value: childPrograms.length, icon: 'fa-book', color: 'bg-blue-500'},
+                                {label: 'Total Poin', value: child.points || 0, icon: 'fa-star', color: 'bg-yellow-500'},
+                                {label: 'Kehadiran', value: `${attendancePercentage}%`, icon: 'fa-calendar-check', color: 'bg-green-500'},
+                                {label: 'Ujian Selesai', value: '5', icon: 'fa-graduation-cap', color: 'bg-purple-500'}
+                            ].map(stat => `
+                                <div class="bg-white rounded-2xl p-6 shadow-sm">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 ${stat.color} rounded-xl flex items-center justify-center">
+                                            <i class="fas ${stat.icon} text-white text-xl"></i>
+                                        </div>
+                                        <div>
+                                            <p class="text-2xl font-black text-slate-800">${stat.value}</p>
+                                            <p class="text-sm text-slate-500 font-bold">${stat.label}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <!-- Child's Programs -->
+                        <div class="bg-white rounded-2xl p-6 shadow-sm mb-6">
+                            <h3 class="font-bold text-slate-800 text-lg mb-6">Program yang Diikuti</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                ${childPrograms.map(program => `
+                                    <div class="border border-slate-200 rounded-xl p-4">
+                                        <h4 class="font-bold text-slate-800 mb-2">${program.name}</h4>
+                                        <p class="text-sm text-slate-500 mb-3">${program.category}</p>
+                                        <div class="flex justify-between items-center">
+                                            <span class="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full font-bold">
+                                                Aktif
+                                            </span>
+                                            <button class="text-xs text-blue-600 font-bold hover:underline">
+                                                Lihat Progress
+                                            </button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                        
+                        <!-- Recent Activities -->
+                        <div class="bg-white rounded-2xl p-6 shadow-sm">
+                            <h3 class="font-bold text-slate-800 text-lg mb-6">Aktivitas Terbaru</h3>
+                            <div class="space-y-4">
+                                ${[
+                                    {activity: 'Menyelesaikan materi Matematika', time: 'Hari ini, 10:30', points: '+10 XP'},
+                                    {activity: 'Mengikuti kuis Coding', time: 'Kemarin, 14:00', points: '+50 XP'},
+                                    {activity: 'Hadir dalam kelas Calistung', time: '2 hari lalu', points: '+5 XP'},
+                                    {activity: 'Mengumpulkan tugas Desain', time: '3 hari lalu', points: '+20 XP'}
+                                ].map(act => `
+                                    <div class="flex items-center justify-between p-4 border border-slate-200 rounded-xl hover:bg-slate-50">
+                                        <div>
+                                            <p class="font-medium text-slate-800">${act.activity}</p>
+                                            <p class="text-sm text-slate-500">${act.time}</p>
+                                        </div>
+                                        <span class="font-bold text-green-600">${act.points}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // =============================================
+        // INITIALIZATION
+        // =============================================
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // Toggle sidebar for mobile
+        document.addEventListener('click', function(e) {
+            if (e.target.id === 'sidebarToggle') {
+                document.querySelector('aside').classList.toggle('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
